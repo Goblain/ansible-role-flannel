@@ -1,0 +1,29 @@
+---
+- stat: path=/usr/sbin/flanneld-{{version}}
+  register: flannel
+
+- get_url: url=https://github.com/coreos/flannel/releases/download/v{{version}}/flannel-{{version}}-linux-amd64.tar.gz dest=/opt/flannel-{{version}}-linux-amd64.tar.gz force=yes
+  when: flannel.stat.exists == False 
+
+- file: path=/opt/flannel state=directory
+  when: flannel.stat.exists == False
+
+- unarchive: src=/opt/flannel-{{version}}-linux-amd64.tar.gz dest=/opt/flannel/
+  when: flannel.stat.exists == False
+
+- copy: src=/opt/flannel/flannel-{{version}}/flanneld dest=/usr/sbin/flanneld-{{version}} mode=774 owner=root group=root
+  when: flannel.stat.exists == False
+
+- file: src=/usr/sbin/flanneld-{{version}} dest=/usr/sbin/flanneld mode=774 owner=root group=root state=link
+
+- template: src=flannel.service.j2 dest=/etc/systemd/system/flannel.service
+  notify:
+  - flannel refresh svc
+  - flannel restart
+
+- file: path=/opt/flannel-{{version}}-linux-amd64.tar.gz state=absent
+
+- file: path=/opt/flannel state=absent
+
+- service: name=flannel enabled=yes state=running
+

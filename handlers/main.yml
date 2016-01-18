@@ -1,0 +1,8 @@
+---
+
+- name: flannel refresh svc
+  shell: systemctl daemon-reload
+
+- name: flannel restart
+  service: name=flannel state=restarted
+ 

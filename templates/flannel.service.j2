@@ -1,0 +1,20 @@
+[Unit]
+Before        = docker.service
+
+[Service]
+
+{% if public_ip is defined %}Environment   = FLANNELD_PUBLIC_IP={{public_ip}}{% endif %}
+
+{% if iface is defined %}Environment   = FLANNELD_IFACE={{iface}}{% endif %}
+
+Environment   = FLANNELD_ETCD_ENDPOINTS={{etcd_endpoints}}
+Environment   = FLANNELD_ETCD_PREFIX={{etcd_prefix}}
+ExecStartPre  = /usr/sbin/etcdctl set /flannel/config '{ "Network": "{{network}}" }'
+ExecStart     = /usr/sbin/flanneld
+
+Restart       = always
+RestartSec    = 5
+
+
+[Install]
+
