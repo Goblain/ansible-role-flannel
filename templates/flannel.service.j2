@@ -9,7 +9,7 @@ Before        = docker.service
 
 Environment   = FLANNELD_ETCD_ENDPOINTS={{etcd_endpoints}}
 Environment   = FLANNELD_ETCD_PREFIX={{etcd_prefix}}
-ExecStartPre  = /usr/sbin/etcdctl set /flannel/config '{ "Network": "{{network}}" }'
+ExecStartPre  = /usr/sbin/etcdctl -C "{{etcd_prefix}}" set /flannel/config '{ "Network": "{{network}}" }'
 ExecStart     = /usr/sbin/flanneld
 
 Restart       = always
